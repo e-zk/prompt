@@ -35,15 +35,11 @@ func pwd() string {
 	}
 	path = strings.Join(dirs, "/")
 
-	return mkcolor(blue, path)
+	return mkcolor(green, path)
 }
 
 func printPrompt() (out string) {
 	return fmt.Sprintf("(%s)", pwd())
-}
-
-func printEnv() (out string) {
-	return fmt.Sprintf("export PS1=\"\\$(%s) \\$ \"\n", os.Args[0])
 }
 
 func main() {
@@ -52,13 +48,13 @@ func main() {
 	cwd, _ = os.Getwd()
 
 	if len(os.Args) < 2 {
-		fmt.Printf(printPrompt())
+		print(printPrompt())
 		return
 	}
 
 	switch os.Args[1] {
 	case "-s":
-		print(printEnv())
+		fmt.Printf("export PS1=\"\\$(%s) \\$ \";\necho prompt setup;\n", os.Args[0])
 		return
 	default:
 		print(printPrompt())
