@@ -1,0 +1,9 @@
+prompt
+=======
+
+usage
+------
+
+	$ go install -v go.zakaria.org/prompt@latest
+	$ eval $(prompt -s)
+
