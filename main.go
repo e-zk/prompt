@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -12,9 +13,9 @@ var (
 	nocolor bool
 )
 
+// Stolen from: https://github.com/icyphox/dotfiles
 // Truncates the current working directory:
 //   /home/icy/foo/bar -> ~/f/bar
-// Stolen from: https://github.com/icyphox/dotfiles
 func pwd() string {
 	var path string
 	if strings.HasPrefix(cwd, home) {
@@ -23,23 +24,18 @@ func pwd() string {
 		// If path doesn't contain $HOME, return the
 		// entire path as is.
 		path = cwd
-		//return path
+		return mkcolor(green, path)
 	}
-
-	dirs := strings.Split(path, "/")
-	for i, d := range dirs {
-		if i == 0 || i == len(dirs)-1 {
-			continue
+	items := strings.Split(path, "/")
+	truncItems := []string{}
+	for i, item := range items {
+		if i == (len(items) - 1) {
+			truncItems = append(truncItems, item)
+			break
 		}
-		dirs[i] = string(d[0])
+		truncItems = append(truncItems, item[:1])
 	}
-	path = strings.Join(dirs, "/")
-
-	return mkcolor(green, path)
-}
-
-func printPrompt() (out string) {
-	return fmt.Sprintf("(%s)", pwd())
+	return mkcolor(green, filepath.Join(truncItems...))
 }
 
 func main() {
@@ -47,17 +43,14 @@ func main() {
 	home = os.Getenv("HOME")
 	cwd, _ = os.Getwd()
 
-	if len(os.Args) < 2 {
-		print(printPrompt())
-		return
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "-s":
+			fmt.Printf("export PS1=\"\\$(%s) \\$ \";\necho prompt setup;\n", os.Args[0])
+			return
+		default:
+			break
+		}
 	}
-
-	switch os.Args[1] {
-	case "-s":
-		fmt.Printf("export PS1=\"\\$(%s) \\$ \";\necho prompt setup;\n", os.Args[0])
-		return
-	default:
-		print(printPrompt())
-		return
-	}
+	fmt.Printf("(%s)", pwd())
 }
